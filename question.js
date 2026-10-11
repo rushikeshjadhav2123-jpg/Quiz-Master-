@@ -136,3 +136,4 @@ window.QUIZ_QUESTIONS = [
   {id:119,category:"PHP",question:"Which keyword can prevent a class method from being overridden?",options:["static","private","final","sealed"],correctIndex:2,difficulty:"Hard",explanation:"A final method cannot be overridden in a subclass."},
   {id:120,category:"PHP",question:"Which PDO method prepares an SQL statement?",options:["queryPrepare()","prepare()","sql_build()","makeStatement()"],correctIndex:1,difficulty:"Hard",explanation:"PDO::prepare() prepares an SQL statement for execution."}
 ];
+
