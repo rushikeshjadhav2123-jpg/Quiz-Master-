@@ -1,85 +1,111 @@
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#0b1020">
+  <meta name="description" content="Practice quizzes, track your score, and retry incorrect questions for free.">
   <title>QuizMaster - Online Quiz</title>
-  <link rel="stylesheet" href="css/style.css">
+  <!-- CSS file in the main repository folder -->
+  <link rel="stylesheet" href="./style.css">
 </head>
 <body>
-
 <header class="topbar">
-  <a class="brand" href="index.html">🧠 QuizMaster</a>
-  <button id="themeToggle" class="btn secondary">🌙 Theme</button>
+  <a class="brand" href="./index.html">🧠 QuizMaster</a>
+  <button id="themeToggle" class="btn secondary" type="button">
+    🌙 Theme
+  </button>
 </header>
-
 <main class="container">
-
+  <!-- HOME / DASHBOARD -->
   <section id="homeScreen">
     <div class="hero">
       <p class="eyebrow">LEARN • PRACTICE • IMPROVE</p>
-      <h1>Test your knowledge.<br><span>Level up.</span></h1>
-      <p>Choose a category, answer questions, track your score and retry incorrect answers.</p>
-
+      <h1>
+        Test your knowledge.<br>
+        <span>Level up.</span>
+      </h1>
+      <p>
+        Choose a category, answer questions, track your score
+        and retry incorrect answers.
+      </p>
       <div class="stats">
-        <div><strong id="statAttempts">0</strong><span>Attempts</span></div>
-        <div><strong id="statAccuracy">0%</strong><span>Accuracy</span></div>
-        <div><strong id="statBest">—</strong><span>Best score</span></div>
+        <div>
+          <strong id="statAttempts">0</strong>
+          <span>Attempts</span>
+        </div>
+        <div>
+          <strong id="statAccuracy">0%</strong>
+          <span>Accuracy</span>
+        </div>
+        <div>
+          <strong id="statBest">—</strong>
+          <span>Best score</span>
+        </div>
       </div>
     </div>
-
     <div class="section-heading">
       <h2>Choose a category</h2>
-      <input id="categorySearch" type="search" placeholder="Search categories...">
+      <input
+        id="categorySearch"
+        type="search"
+        placeholder="Search categories..."
+        aria-label="Search quiz categories"
+      >
     </div>
-
     <div id="categoryGrid" class="category-grid"></div>
-
     <div class="section-heading">
       <h2>Recent attempts</h2>
-      <button id="clearHistory" class="text-btn">Reset progress</button>
+      <button id="clearHistory" class="text-btn" type="button">
+        Reset progress
+      </button>
     </div>
     <div id="historyList" class="history-list"></div>
   </section>
-
+  <!-- QUIZ SCREEN -->
   <section id="quizScreen" class="hidden">
     <div class="quiz-topline">
-      <button id="backHome" class="text-btn">← Dashboard</button>
+      <button id="backHome" class="text-btn" type="button">
+        ← Dashboard
+      </button>
       <span id="quizMeta" class="pill">Quiz</span>
       <strong id="timer">⏱ 5:00</strong>
     </div>
-
     <div class="progress-track">
       <div id="progressBar"></div>
     </div>
-
     <div class="quiz-card">
       <div class="question-meta">
         <span id="questionCounter">QUESTION 1</span>
-        <button id="markReview" class="text-btn">☆ Mark for review</button>
+        <button id="markReview" class="text-btn" type="button">
+          ☆ Mark for review
+        </button>
       </div>
-
       <h2 id="questionText"></h2>
       <div id="optionsList" class="options-list"></div>
-
       <div class="quiz-footer">
-        <button id="prevQuestion" class="btn secondary">Previous</button>
+        <button id="prevQuestion" class="btn secondary" type="button">
+          Previous
+        </button>
         <span id="answeredCount">0 answered</span>
-        <button id="nextQuestion" class="btn primary">Next →</button>
+        <button id="nextQuestion" class="btn primary" type="button">
+          Next →
+        </button>
       </div>
     </div>
-
     <div class="question-nav-panel">
       <strong>Question navigator</strong>
       <div id="questionNav" class="question-nav"></div>
-      <button id="submitQuiz" class="btn submit">Submit quiz</button>
+      <button id="submitQuiz" class="btn submit" type="button">
+        Submit quiz
+      </button>
     </div>
   </section>
-
+  <!-- RESULT SCREEN -->
   <section id="resultScreen" class="hidden">
-    <button id="resultHome" class="text-btn">← Dashboard</button>
-
+    <button id="resultHome" class="text-btn" type="button">
+      ← Dashboard
+    </button>
     <div class="result-hero">
       <p class="eyebrow">QUIZ COMPLETED</p>
       <h1 id="resultTitle">Good work!</h1>
@@ -88,32 +114,43 @@
         <strong id="resultPercent">0%</strong>
         <span>Your score</span>
       </div>
-
       <div class="result-stats">
-        <div><strong id="resultCorrect">0</strong><span>Correct</span></div>
-        <div><strong id="resultWrong">0</strong><span>Incorrect</span></div>
-        <div><strong id="resultSkipped">0</strong><span>Skipped</span></div>
-        <div><strong id="resultTime">0:00</strong><span>Time taken</span></div>
+        <div>
+          <strong id="resultCorrect">0</strong>
+          <span>Correct</span>
+        </div>
+        <div>
+          <strong id="resultWrong">0</strong>
+          <span>Incorrect</span>
+        </div>
+        <div>
+          <strong id="resultSkipped">0</strong>
+          <span>Skipped</span>
+        </div>
+        <div>
+          <strong id="resultTime">0:00</strong>
+          <span>Time taken</span>
+        </div>
       </div>
     </div>
-
     <div class="result-actions">
-      <button id="retryWrong" class="btn primary">Retry incorrect questions</button>
-      <button id="newQuiz" class="btn secondary">New quiz</button>
+      <button id="retryWrong" class="btn primary" type="button">
+        Retry incorrect questions
+      </button>
+      <button id="newQuiz" class="btn secondary" type="button">
+        New quiz
+      </button>
     </div>
-
     <h2>Answer review</h2>
     <div id="reviewList" class="review-list"></div>
   </section>
-
 </main>
-
 <footer>
   QuizMaster · Free Online Quiz · Made with HTML, CSS and JavaScript
 </footer>
-
-<script src="data/questions.js"></script>
-<script src="js/app.js"></script>
+<!-- JavaScript files in the main repository folder.
+     Load questions before the app. -->
+<script src="./question.js"></script>
+<script src="./app.js"></script>
 </body>
 </html>
-
