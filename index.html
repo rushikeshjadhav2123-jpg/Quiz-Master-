@@ -1,0 +1,31 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="icon" type="image/svg+xml" href="/vite.svg" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Local Storage Quiz Website</title>
+  </head>
+  <body>
+    <div id="app">
+      <header class="app-header">
+        <div class="header-inner">
+          <div class="brand" id="brand">
+            <svg class="brand-icon" viewBox="0 0 24 24" width="28" height="28" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <circle cx="12" cy="12" r="10"/>
+              <path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/>
+              <line x1="12" y1="17" x2="12.01" y2="17"/>
+            </svg>
+            <span class="brand-name">QuizMaster</span>
+          </div>
+          <div class="header-stats" id="header-stats"></div>
+        </div>
+      </header>
+      <main class="app-main" id="app-main"></main>
+      <footer class="app-footer">
+        <p>Built with HTML, CSS &amp; Vanilla JavaScript &middot; Scores saved locally</p>
+      </footer>
+    </div>
+    <script type="module" src="/main.js"></script>
+  </body>
+</html>
