@@ -1,6 +1,14 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+  <!-- Login guard: redirect to login page if the user is not logged in -->
+  <script>
+    try {
+      if (!localStorage.getItem('qm_session')) location.replace('login.html');
+    } catch (e) {
+      location.replace('login.html');
+    }
+  </script>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta name="theme-color" content="#0b1020">
@@ -12,9 +20,15 @@
 <body>
 <header class="topbar">
   <a class="brand" href="./index.html">🧠 QuizMaster</a>
-  <button id="themeToggle" class="btn secondary" type="button">
-    🌙 Theme
-  </button>
+  <div style="display:flex;align-items:center;gap:10px;">
+    <span id="userName" style="font-size:.9rem;opacity:.85;"></span>
+    <button id="themeToggle" class="btn secondary" type="button">
+      🌙 Theme
+    </button>
+    <button id="logoutBtn" class="btn secondary" type="button">
+      Logout
+    </button>
+  </div>
 </header>
 <main class="container">
   <!-- HOME / DASHBOARD -->
@@ -152,5 +166,20 @@
      Load questions before the app. -->
 <script src="./question.js"></script>
 <script src="./app.js"></script>
+
+<!-- Show logged-in user name and handle logout -->
+<script>
+  (function () {
+    var session = null;
+    try { session = JSON.parse(localStorage.getItem('qm_session')); } catch (e) {}
+    if (session && session.name) {
+      document.getElementById('userName').textContent = 'Hi, ' + session.name;
+    }
+    document.getElementById('logoutBtn').addEventListener('click', function () {
+      try { localStorage.removeItem('qm_session'); } catch (e) {}
+      location.href = 'login.html';
+    });
+  })();
+</script>
 </body>
 </html>
