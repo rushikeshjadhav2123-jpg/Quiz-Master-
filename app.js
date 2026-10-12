@@ -1,4 +1,3 @@
-
 const $ = id => document.getElementById(id);
 
 const CATEGORIES = [
@@ -12,23 +11,42 @@ const CATEGORIES = [
   { name: "PHP", icon: "🐘" }
 ];
 
+// Per-user storage: every logged-in user gets their own progress
+let session = null;
+try {
+  session = JSON.parse(localStorage.getItem("qm_session"));
+} catch (_) {
+  session = null;
+}
+
+const USER_KEY = "quizMasterData:" +
+  (session && session.email ? session.email : "guest");
+const THEME_KEY = "quizMasterTheme";
+
 let saved = {};
 try {
-  saved = JSON.parse(localStorage.getItem("quizMasterData")) || {};
+  saved = JSON.parse(localStorage.getItem(USER_KEY)) || {};
 } catch (_) {
   saved = {};
 }
 
 let attempted = saved.attempted || {};
 let history = saved.history || [];
-let theme = saved.theme || "light";
+
+let theme = "light";
+try {
+  theme = localStorage.getItem(THEME_KEY) || "light";
+} catch (_) {
+  theme = "light";
+}
+
 let quiz = null;
 let timerId = null;
 
 function save() {
   try {
-    localStorage.setItem("quizMasterData",
-      JSON.stringify({ attempted, history, theme }));
+    localStorage.setItem(USER_KEY, JSON.stringify({ attempted, history }));
+    localStorage.setItem(THEME_KEY, theme);
   } catch (_) {
     console.warn("Progress could not be saved.");
   }
@@ -455,7 +473,7 @@ $("markReview").addEventListener("click", () => {
 $("submitQuiz").addEventListener("click", () => finishQuiz(false));
 
 $("clearHistory").addEventListener("click", () => {
-  if (confirm("Reset all quiz progress on this browser?")) {
+  if (confirm("Reset all quiz progress for this account on this browser?")) {
     attempted = {};
     history = [];
     save();
