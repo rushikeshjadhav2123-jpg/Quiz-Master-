@@ -12,15 +12,10 @@ const CATEGORIES = [
 ];
 
 // Per-user storage: every logged-in user gets their own progress
-let session = null;
-try {
-  session = JSON.parse(localStorage.getItem("qm_session"));
-} catch (_) {
-  session = null;
-}
+const session = window.QM_USER || null;
 
 const USER_KEY = "quizMasterData:" +
-  (session && session.email ? session.email : "guest");
+  (session && session.id ? session.id : "guest");
 const THEME_KEY = "quizMasterTheme";
 
 let saved = {};
