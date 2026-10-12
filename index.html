@@ -162,12 +162,29 @@
 <script>
   // 1) Check Supabase session  2) set window.QM_USER  3) then load question.js and app.js
   (function () {
+    function fail(msg) {
+      document.documentElement.style.visibility = 'visible';
+      document.body.innerHTML =
+        '<div style="padding:24px;font-family:sans-serif;line-height:1.5">' +
+        '<h2>Setup problem</h2><p>' + msg + '</p>' +
+        '<p><a href="login.html">Go to login page</a></p></div>';
+    }
+
+    if (!window.supabase) {
+      fail('Supabase library did not load. Check the supabase script line in index.html and your internet connection.');
+      return;
+    }
+    if (!window.sb) {
+      fail('supabase-config.js is missing, has a typo in its name, or has an error.');
+      return;
+    }
+
     function loadScript(src) {
       return new Promise(function (resolve, reject) {
         var s = document.createElement('script');
         s.src = src;
         s.onload = resolve;
-        s.onerror = reject;
+        s.onerror = function () { reject(new Error('Could not load ' + src)); };
         document.body.appendChild(s);
       });
     }
@@ -197,8 +214,8 @@
       return loadScript('./question.js')
         .then(function () { return loadScript('./app.js'); })
         .then(function () { document.documentElement.style.visibility = 'visible'; });
-    }).catch(function () {
-      location.replace('login.html');
+    }).catch(function (err) {
+      fail('Error: ' + (err && err.message ? err.message : err));
     });
   })();
 </script>
