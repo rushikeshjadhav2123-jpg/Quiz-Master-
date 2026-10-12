@@ -1,14 +1,8 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <!-- Login guard: redirect to login page if the user is not logged in -->
-  <script>
-    try {
-      if (!localStorage.getItem('qm_session')) location.replace('login.html');
-    } catch (e) {
-      location.replace('login.html');
-    }
-  </script>
+  <!-- Hide the page until we know the user is logged in -->
+  <script>document.documentElement.style.visibility = 'hidden';</script>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta name="theme-color" content="#0b1020">
@@ -16,6 +10,8 @@
   <title>QuizMaster - Online Quiz</title>
   <!-- CSS file in the main repository folder -->
   <link rel="stylesheet" href="./style.css">
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.49.4/dist/umd/supabase.js"></script>
+  <script src="./supabase-config.js"></script>
 </head>
 <body>
 <header class="topbar">
@@ -162,23 +158,47 @@
 <footer>
   QuizMaster · Free Online Quiz · Made with HTML, CSS and JavaScript
 </footer>
-<!-- JavaScript files in the main repository folder.
-     Load questions before the app. -->
-<script src="./question.js"></script>
-<script src="./app.js"></script>
 
-<!-- Show logged-in user name and handle logout -->
 <script>
+  // 1) Check Supabase session  2) set window.QM_USER  3) then load question.js and app.js
   (function () {
-    var session = null;
-    try { session = JSON.parse(localStorage.getItem('qm_session')); } catch (e) {}
-    if (session && session.name) {
-      document.getElementById('userName').textContent = 'Hi, ' + session.name;
+    function loadScript(src) {
+      return new Promise(function (resolve, reject) {
+        var s = document.createElement('script');
+        s.src = src;
+        s.onload = resolve;
+        s.onerror = reject;
+        document.body.appendChild(s);
+      });
     }
-    document.getElementById('logoutBtn').addEventListener('click', function () {
-      try { localStorage.removeItem('qm_session'); } catch (e) {}
-      location.href = 'login.html';
-         <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+    window.sb.auth.getSession().then(function (res) {
+      var session = res.data && res.data.session;
+      if (!session) {
+        location.replace('login.html');
+        return;
+      }
+
+      var user = session.user;
+      var meta = user.user_metadata || {};
+      window.QM_USER = {
+        id: user.id,
+        email: user.email,
+        name: meta.name || user.email
+      };
+
+      document.getElementById('userName').textContent = 'Hi, ' + window.QM_USER.name;
+
+      document.getElementById('logoutBtn').addEventListener('click', async function () {
+        await window.sb.auth.signOut();
+        location.href = 'login.html';
+      });
+
+      return loadScript('./question.js')
+        .then(function () { return loadScript('./app.js'); })
+        .then(function () { document.documentElement.style.visibility = 'visible'; });
+    }).catch(function () {
+      location.replace('login.html');
     });
   })();
 </script>
