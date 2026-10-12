@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Log in - QuizMaster</title>
+<style>
+  :root { --bg:#0b1020; --card:#131a30; --line:#26304f; --text:#e8ecf8; --muted:#8d98b8; --accent:#6c8cff; --danger:#ff6b7a; --ok:#4cd9a0; }
+  :root[data-theme="light"] { --bg:#f3f5fb; --card:#ffffff; --line:#d9deee; --text:#151b30; --muted:#5d6786; --accent:#3d5afe; --danger:#d63048; --ok:#12945f; }
+  * { box-sizing: border-box; }
+  body { margin:0; min-height:100vh; display:grid; place-items:center; padding:20px; background:var(--bg); color:var(--text); font-family:system-ui,-apple-system,"Segoe UI",Roboto,sans-serif; }
+  .box { width:100%; max-width:400px; background:var(--card); border:1px solid var(--line); border-radius:16px; padding:28px; }
+  .brand { font-size:1.3rem; font-weight:700; margin-bottom:4px; }
+  .sub { color:var(--muted); margin:0 0 22px; font-size:.95rem; }
+  .tabs { display:grid; grid-template-columns:1fr 1fr; background:var(--bg); border:1px solid var(--line); border-radius:10px; padding:4px; margin-bottom:20px; }
+  .tabs button { border:0; background:transparent; color:var(--muted); padding:9px; border-radius:7px; font:inherit; font-weight:600; cursor:pointer; }
+  .tabs button.active { background:var(--accent); color:#fff; }
+  label { display:block; font-size:.85rem; color:var(--muted); margin:14px 0 6px; }
+  input { width:100%; padding:11px 12px; background:var(--bg); color:var(--text); border:1px solid var(--line); border-radius:9px; font:inherit; }
+  input:focus-visible, button:focus-visible { outline:2px solid var(--accent); outline-offset:2px; }
+  .submit { width:100%; margin-top:20px; padding:12px; border:0; border-radius:9px; background:var(--accent); color:#fff; font:inherit; font-weight:700; cursor:pointer; }
+  .msg { min-height:1.3em; margin:14px 0 0; font-size:.9rem; color:var(--danger); }
+  .msg.ok { color:var(--ok); }
+  .note { margin-top:18px; font-size:.78rem; color:var(--muted); line-height:1.4; }
+  .hidden { display:none; }
+</style>
+</head>
+<body>
+<main class="box">
+  <div class="brand">🧠 QuizMaster</div>
+  <p class="sub" id="sub">Log in to continue your quizzes.</p>
+
+  <div class="tabs" role="tablist">
+    <button type="button" id="tabLogin" class="active" role="tab">Log in</button>
+    <button type="button" id="tabSignup" role="tab">Sign up</button>
+  </div>
+
+  <div id="nameRow" class="hidden">
+    <label for="name">Full name</label>
+    <input id="name" type="text" autocomplete="name">
+  </div>
+
+  <label for="email">Email</label>
+  <input id="email" type="email" autocomplete="email">
+
+  <label for="password">Password</label>
+  <input id="password" type="password" autocomplete="current-password">
+
+  <div id="confirmRow" class="hidden">
+    <label for="confirm">Confirm password</label>
+    <input id="confirm" type="password" autocomplete="new-password">
+  </div>
+
+  <button class="submit" id="submitBtn" type="button">Log in</button>
+  <p class="msg" id="msg" role="alert"></p>
+
+  <p class="note">Accounts are saved only in this browser on this device. Use this for practice, not for real passwords.</p>
+</main>
+
+<script>
+(function () {
+  var USERS_KEY = 'qm_users';
+  var SESSION_KEY = 'qm_session';
+  var mode = 'login';
+  var $ = function (id) { return document.getElementById(id); };
+
+  try {
+    var t = localStorage.getItem('theme');
+    if (t === 'light' || t === 'dark') document.documentElement.setAttribute('data-theme', t);
+  } catch (e) {}
+
+  try {
+    if (localStorage.getItem(SESSION_KEY)) { location.replace('index.html'); return; }
+  } catch (e) {}
+
+  function readUsers() {
+    try { return JSON.parse(localStorage.getItem(USERS_KEY)) || {}; }
+    catch (e) { return {}; }
+  }
+  function writeUsers(u) {
+    try { localStorage.setItem(USERS_KEY, JSON.stringify(u)); return true; }
+    catch (e) { return false; }
+  }
+  async function hash(text) {
+    var buf = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(text));
+    return Array.from(new Uint8Array(buf)).map(function (b) {
+      return b.toString(16).padStart(2, '0');
+    }).join('');
+  }
+  function show(text, ok) {
+    var m = $('msg');
+    m.textContent = text;
+    m.className = 'msg' + (ok ? ' ok' : '');
+  }
+  function setMode(next) {
+    mode = next;
+    var signup = mode === 'signup';
+    $('tabLogin').classList.toggle('active', !signup);
+    $('tabSignup').classList.toggle('active', signup);
+    $('nameRow').classList.toggle('hidden', !signup);
+    $('confirmRow').classList.toggle('hidden', !signup);
+    $('submitBtn').textContent = signup ? 'Create account' : 'Log in';
+    $('sub').textContent = signup ? 'Create an account to save your scores.' : 'Log in to continue your quizzes.';
+    $('password').autocomplete = signup ? 'new-password' : 'current-password';
+    show('');
+  }
+  async function submit() {
+    var email = $('email').value.trim().toLowerCase();
+    var password = $('password').value;
+    var users = readUsers();
+
+    if (!/^\S+@\S+\.\S+$/.test(email)) return show('Enter a valid email address.');
+    if (password.length < 6) return show('Password must be at least 6 characters.');
+
+    if (mode === 'signup') {
+      var name = $('name').value.trim();
+      if (!name) return show('Enter your name.');
+      if (password !== $('confirm').value) return show('Passwords do not match.');
+      if (users[email]) return show('This email already has an account. Log in instead.');
+      users[email] = { name: name, pass: await hash(password) };
+      if (!writeUsers(users)) return show('Could not save the account. Check that browser storage is allowed.');
+      localStorage.setItem(SESSION_KEY, JSON.stringify({ email: email, name: name }));
+      show('Account created. Redirecting...', true);
+      setTimeout(function () { location.href = 'index.html'; }, 500);
+    } else {
+      var user = users[email];
+      if (!user || user.pass !== await hash(password)) return show('Email or password is incorrect.');
+      localStorage.setItem(SESSION_KEY, JSON.stringify({ email: email, name: user.name }));
+      show('Logged in. Redirecting...', true);
+      setTimeout(function () { location.href = 'index.html'; }, 400);
+    }
+  }
+
+  $('tabLogin').addEventListener('click', function () { setMode('login'); });
+  $('tabSignup').addEventListener('click', function () { setMode('signup'); });
+  $('submitBtn').addEventListener('click', submit);
+  document.addEventListener('keydown', function (e) { if (e.key === 'Enter') submit(); });
+})();
+</script>
+</body>
+</html>
